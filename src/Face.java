@@ -167,40 +167,6 @@ public class Face{
         draw = true;
     }
     /*
-        * Converts the 3D environment to a 2D projection that can be drawn onto the GUI.
-
-        * To be resourceful, it converts the local coordinates of the face to the 2D screen coordinates.
-        The x and y local coordinates convert to 2D screen coordinates. The local z coordinates afterwards
-        can be ignored, as they are not neccessary for drawing onto the 2D display.
-    */
-    public void toscreen(Camera cam){
-        int count = 0;
-        for(int i=0;i<x.length;i++){
-            double xDist,yDist,zDist;
-            xDist = x[i] - cam.getX();
-            yDist = y[i] - cam.getY();
-            zDist = z[i] - cam.getZ();
-            
-            double parr;
-            parr = (1000.0/(yDist));
-            parr=Math.abs(parr);
-            
-            x[i] = ((cam.getWidth()/2)+(parr*(xDist)));
-            y[i] = (((cam.getHeight()/2)-(parr*zDist)));
-            
-            /*
-                Counts if all the vertices of a face stretch beyond the camera's view.
-                If all vertices do, then don't draw the face.
-            */
-            if(x[i] < 0 || x[i] > cam.getWidth() || y[i] < 0 || y[i] > cam.getHeight()){
-                count++;
-            }
-        }
-        if(count >= x.length){
-           draw = false;
-        }
-    }
-    /*
         * Rotates the 3D world about the Z (vertical) axis.
     */
     public void rotateZ(Camera cam){
@@ -253,6 +219,40 @@ public class Face{
         }
         if(count >= x.length){
             draw = false;
+        }
+    }
+    /*
+        * Converts the 3D environment to a 2D projection that can be drawn onto the GUI.
+
+        * To be resourceful, it converts the local coordinates of the face to the 2D screen coordinates.
+        The x and y local coordinates convert to 2D screen coordinates. The local z coordinates afterwards
+        can be ignored, as they are not neccessary for drawing onto the 2D display.
+    */
+    public void toscreen(Camera cam){
+        int count = 0;
+        for(int i=0;i<x.length;i++){
+            double xDist,yDist,zDist;
+            xDist = x[i] - cam.getX();
+            yDist = y[i] - cam.getY();
+            zDist = z[i] - cam.getZ();
+            
+            double parr;
+            parr = (1000.0/(yDist));
+            parr=Math.abs(parr);
+            
+            x[i] = ((cam.getWidth()/2)+(parr*(xDist)));
+            y[i] = (((cam.getHeight()/2)-(parr*zDist)));
+            
+            /*
+                Counts if all the vertices of a face stretch beyond the camera's view.
+                If all vertices do, then don't draw the face.
+            */
+            if(x[i] < 0 || x[i] > cam.getWidth() || y[i] < 0 || y[i] > cam.getHeight()){
+                count++;
+            }
+        }
+        if(count >= x.length){
+           draw = false;
         }
     }
     /*
