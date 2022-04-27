@@ -3,44 +3,29 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 public class RObject{
+    /*
+        * Declaration and instantiation.
+    */
     private ArrayList<Face> faces;
     
     public RObject(){
-        
         faces = new ArrayList<>();
-        
-//        Face f;
-//        f = new Face(HEIGHT,WIDTH);//Bottom
-//        f.setX(-200, -200, 200, 200);
-//        f.setY(200, -200, -200, 200);
-//        f.setZ(-100, -100, -100, -100);
-//        faces.add(f);
-        
-//        Face f;
-//        f = new Face(HEIGHT,WIDTH);//Bottom
-//        f.setX(0, 0, 100, 100);
-//        f.setY(200, 0, 0, 200);
-//        f.setZ(0, 0, 0, 0);
-//        faces.add(f);
-//        
-//        f = new Face(HEIGHT,WIDTH);//Back
-//        f.setX(0, 0, 100, 100);
-//        f.setY(200, 200, 200, 200);
-//        f.setZ(100, 0, 0, 100);
-//        faces.add(f);
-//        
-//        f = new Face(HEIGHT,WIDTH);
-//        f.setX(0, 0, 100, 100);
-//        f.setY(200, 0, 0, 200);
-//        f.setZ(100, 0, 0, 100);
-//        faces.add(f);
     }
+    /*
+        * Adds a face to the RObject.
+    */
     public void addFace(Face f){
         faces.add(f);
     }
+    /*
+        * Returns the amount of faces in the RObject.
+    */
     public int getFaceCount(){
         return faces.size();
     }
+    /*
+        * Performs all 3D logic. Such as translation and rotation in the 3D environment.
+    */
     public void actions(Camera cam){
         for(int i=0;i<faces.size();i++){
             faces.get(i).reset();
@@ -49,28 +34,29 @@ public class RObject{
             faces.get(i).toscreen(cam);
         }
         /*
-        Face temp = new Face();
-        for(int i=0;i<faces.size();i++){
-            for(int j=i+1;j<faces.size();j++){
-                if(faces.get(j).dist(cam) > faces.get(i).dist(cam)){
-                    temp.setAll(faces.get(i));
-                    faces.get(i).setAll(faces.get(j));
-                    faces.get(j).setAll(temp);
+            * This is the Rearranger.
+            
+            * At the moment it has a long way to go for optimization.
+        */
+        if(false){//Disabled
+            Face temp = new Face();
+            for(int i=0;i<faces.size();i++){
+                for(int j=i+1;j<faces.size();j++){
+                    if(faces.get(j).dist(cam) > faces.get(i).dist(cam)){
+                        temp.setAll(faces.get(i));
+                        faces.get(i).setAll(faces.get(j));
+                        faces.get(j).setAll(temp);
+                    }
                 }
             }
         }
-        */
     }
+    /*
+        * Draws RObject to screen, by drawing each face.
+    */
     public void draw(Graphics g, Camera cam){
-        // int colnum = 0;
         for(int i=0;i<faces.size();i++){
-//            if(colnum > 255){
-//                colnum = 255;
-//            }
-//            g.setColor(new Color(colnum,0,0));
-            
             faces.get(i).draw(g,cam);
-//            colnum+=25;
         }
     }
 }

@@ -1,10 +1,17 @@
 public class Camera{
+    /*
+        * Declaration and Inilization
+    */
+
     private int WIDTH, HEIGHT;
     private double yaw, pitch;
     private double x,y,z;
 
     private int scale;
     
+    /*
+        * Default Constructor
+    */
     public Camera(){
         yaw = 0;
         pitch = 0;
@@ -18,6 +25,9 @@ public class Camera{
 
         scale = 0;
     }
+    /*
+        * Accessor and mutator methods
+    */
     public double getX(){
         return x;
     }
@@ -39,6 +49,11 @@ public class Camera{
     public double getYaw(){
         return yaw;
     }
+    /*
+        * Setting Yaw and Pitch based on the built-in limits of the camera in 3D space.
+
+        * The camera may only rotate 180 degrees in the vertical direction.
+    */
     public void setYaw(double n){
         n+=360;
         n%=360;
@@ -59,12 +74,18 @@ public class Camera{
         
         pitch = n;
     }
+    /*
+        * Setting the resolution of the camera, and the scale of the pixels.
+    */
     public void setRes(int a, int b, int s){
         WIDTH = a;
         HEIGHT = b;
 
         scale = s;
     }
+    /*
+        * Accessor and mutator methods for screen resolution and scale.
+    */
     public void setWidth(int n){
         WIDTH = n;
     }
@@ -83,6 +104,10 @@ public class Camera{
     public int getScale(){
         return scale;
     }
+
+    /*
+        * CAMERA 3D WORLD SPACE ANGULAR COMPENSATION
+    */
     public void compensation(boolean w, boolean a, boolean s, boolean d){
         double yaw;
         yaw = getYaw();

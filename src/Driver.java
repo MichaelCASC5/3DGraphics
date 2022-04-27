@@ -1,3 +1,15 @@
+/*
+========================= ========================= 
+        * R A D I U M  3 D
+        * MICHAEL CALLE, 2022
+
+        * Main Driver.java
+
+        * 3D Graphics Framework Software. Eventually,
+        this will provide the backbone of a 3D program
+        that can be easily repurposed for any other use.
+========================= ========================= 
+*/
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -9,6 +21,9 @@ import java.io.FileWriter;
 import java.util.Scanner;
 
 public class Driver extends JComponent implements KeyListener, MouseListener, MouseMotionListener{
+    /*
+        * Declaring variables and objects
+    */
     private int WIDTH;
     private int HEIGHT;
     
@@ -17,18 +32,22 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
     
     private Sky sky;
     
-    private ArrayList<RObject> scene = new ArrayList<>();
+    private ArrayList<RObject> scene;
     
     public Driver(){
+        /*
+            * Instantiating Objects, initilizing vars
+        */
+
+        //Canvas Resolution
         WIDTH = 1000;
         HEIGHT = 500;
+
+        scene = new ArrayList<>();
         
+        //Read Scene
         read("Scene 1");
         System.out.println("Object Face Count: " + scene.get(0).getFaceCount());
-        // RObject robj = new RObject();
-        // Face newface = new Face();
-        // // rojb.addFace()
-        // // scene.add(new Face());
 
         k = new Keys();
         cam = new Camera();
@@ -51,27 +70,29 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         gui.addMouseListener(this);
         gui.addMouseMotionListener(this);
     }
+    /*
+        * Paint to Canvas
+    */
     public void paintComponent(Graphics g){
-        // sky.draw(g);
         g.setColor(Color.black);
         g.fillRect(0,0,WIDTH,HEIGHT);
         for(int i=0;i<scene.size();i++){
             scene.get(i).actions(cam);
             scene.get(i).draw(g,cam);
         }
-
-
-        // g.setColor(Color.gray);
-        // for(int i=0;i<WIDTH;i+=5){
-        //     for(int j=0;j<HEIGHT;j+=5){
-        //         g.drawRect(i,j,5,5);
-        //     }
-        // }
     }
+    /*
+        * Game Logic
+    */
     public void loop(){
-        //Camera Movement
+        /*
+            * Camerica compensation logic
+        */
         cam.compensation(k.getW(), k.getA(), k.getS(), k.getD());
         
+        /*
+            * Horizontal movement
+        */
         if(k.getArL()){ 
             cam.setYaw(cam.getYaw()+2);
         }
@@ -85,6 +106,9 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
             cam.setPitch(cam.getPitch()+2);
         }
         
+        /*
+            * Vertical movement
+        */
         if(k.getSpace()){
             cam.setZ(cam.getZ()+0.2);
         }
@@ -92,18 +116,13 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
             cam.setZ(cam.getZ()-0.2);
         }
         
-        //Translation
-        for(int i=0;i<scene.size();i++){
-            // scene.get(i).actions(cam);
-        }
-        
-        // sky.actions(cam);
-        
         repaint();
     }
+    /*
+        * User input and key codes
+    */
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
-//        System.out.println(key);
         
         if(key == 39){              //LEFT ARROW
             k.setArL(true);
@@ -168,6 +187,11 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
     }
     public void mouseDragged(MouseEvent e){
     }
+    /*
+        * Reading Files
+        * Helper method to the read() method.
+        * Append vertices to new face generated
+    */
     public double[] append(double[] a, double n){
         double[] output = new double[a.length+1];
         
@@ -179,12 +203,12 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         
         return output;
     }
+    /*
+        * Reading Files
+    */
     public void read(String d){
         System.out.println(System.getProperty("user.dir"));
         File directory = new File("C:\\Users\\micha\\Documents\\NetBeansProjects\\Radium Engine\\" + d);
-        // String user = System.getProperty("user.dir");
-        // File directory = new File(user + "\\" + d);
-        // System.out.println(user + d);
         
         File[] files = directory.listFiles();
         
@@ -270,9 +294,6 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
                     
                     if(addScene){
                         f = new Face(x,y,z);
-                        // f.setX(x);
-                        // f.setY(y);
-                        // f.setZ(z);
                         r.addFace(f);
                         
                         x = new double[0];
@@ -290,6 +311,9 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
             
         }
     }
+    /*
+        * Helper method to the main method; starts the game thread
+    */
     public void start(final int ticks){
         Thread gameThread = new Thread(){
             public void run(){
@@ -305,6 +329,9 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         };	
         gameThread.start();
     }
+    /*
+        * Main method, instantiates the driver and starts the game thread
+    */
     public static void main(String[] args){
         Driver g = new Driver();
         g.start(60);

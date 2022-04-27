@@ -1,8 +1,10 @@
-
 import java.awt.Color;
 import java.awt.Graphics;
 
 public class Sky{
+    /*
+        * Declaration and Initlization
+    */
     private int HEIGHT,WIDTH;
     private int horizon;
     
@@ -12,6 +14,9 @@ public class Sky{
         HEIGHT = h;
         WIDTH = w;
     }
+    /*
+        * Camera logic
+    */
     public void actions(Camera c){
         horizon = (int)c.getPitch();
         if(horizon < 360 && horizon > 90){
@@ -20,6 +25,9 @@ public class Sky{
         horizon*=-17.5555;
         horizon+=HEIGHT/2;
     }
+    /*
+        * Draws sky in the background
+    */
     public void draw(Graphics g){
         //Background colors
         g.setColor(new Color(90,90,90));

@@ -3,12 +3,21 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 public class Face{
-    private double[] xPoints, yPoints, zPoints;
-    private double[] x,y,z;
+    /*
+        * Declaration and instantiation.
+    */
+
+    /*
+        * Global and local coordinate arrays.
+    */
+    private double[] xPoints, yPoints, zPoints; //global
+    private double[] x,y,z;                     //local
     
-    // private int HEIGHT, WIDTH;
     private boolean draw;
     
+    /*
+        * Default Constructor
+    */
     public Face(){
         xPoints = new double[0];
         yPoints = new double[0];
@@ -18,11 +27,13 @@ public class Face{
         y = new double[0];
         z = new double[0];
         
-        // HEIGHT = 0;
-        // WIDTH = 0;
-        
         draw = false;
     }
+    /*
+        * Parameterized Constructor
+
+        * Accepts three arrays. Each for the x, y, and z coordinates of all vertices that form the array.
+    */    
     public Face(double[] a, double[] b, double[] c){
         xPoints = new double[a.length];
         yPoints = new double[b.length];
@@ -39,11 +50,11 @@ public class Face{
         setArray(y,b);
         setArray(z,c);
         
-        // HEIGHT = h;
-        // WIDTH = w;
-        
         draw = false;
     }
+    /*
+        * Accessor and mutator methods
+    */
     public void setX(double[] n){
         xPoints = new double[n.length];
         x = new double[n.length];
@@ -89,6 +100,11 @@ public class Face{
     public double[] getZ(){
         return z;
     }
+    /*
+        * Set all geometry of a face to that of another face.
+
+        * Accepts a Face object.
+    */
     public void setAll(Face f){
         xPoints = new double[f.getXPoints().length];
         yPoints = new double[f.getYPoints().length];
@@ -106,6 +122,9 @@ public class Face{
         setArray(y,f.getY());
         setArray(z,f.getZ());
     }
+    /*
+        * Print statements
+    */
     public void printXP(){
         for(int i=0;i<xPoints.length;i++){
             System.out.print(xPoints[i] + " ");
@@ -124,6 +143,11 @@ public class Face{
         }
         System.out.println();
     }
+    /*
+        * Simple method that sets the contents of one array to that of another array.
+
+        * Different from setting one array equal to another, which will pass the reference
+    */
     public void setArray(double[] a, double[] b){
         if(a.length == b.length){
             for(int i=0;i<a.length;i++){
@@ -131,6 +155,9 @@ public class Face{
             }
         }
     }
+    /*
+        * Resets the local array to the global array.
+    */
     public void reset(){
         for(int i=0;i<xPoints.length;i++){
             x[i] = xPoints[i];
@@ -139,6 +166,13 @@ public class Face{
         }
         draw = true;
     }
+    /*
+        * Converts the 3D environment to a 2D projection that can be drawn onto the GUI.
+
+        * To be resourceful, it converts the local coordinates of the face to the 2D screen coordinates.
+        The x and y local coordinates convert to 2D screen coordinates. The local z coordinates afterwards
+        can be ignored, as they are not neccessary for drawing onto the 2D display.
+    */
     public void toscreen(Camera cam){
         int count = 0;
         for(int i=0;i<x.length;i++){
@@ -150,10 +184,6 @@ public class Face{
             double parr;
             parr = (1000.0/(yDist));
             parr=Math.abs(parr);
-//            boolean neg = false;
-//            if(yDist < 0){
-//                neg = true;
-//            }
             
             x[i] = ((cam.getWidth()/2)+(parr*(xDist)));
             y[i] = (((cam.getHeight()/2)-(parr*zDist)));
@@ -161,29 +191,18 @@ public class Face{
             /*
                 Counts if all the vertices of a face stretch beyond the camera's view.
                 If all vertices do, then don't draw the face.
-                This is done here rather than in draw, as if it is done in draw, then
-                only part of the single face will draw, and another part will not be.
             */
             if(x[i] < 0 || x[i] > cam.getWidth() || y[i] < 0 || y[i] > cam.getHeight()){
                 count++;
             }
-//            if(neg){
-//                if(y[i] < HEIGHT*-1){
-//                    y[i] = HEIGHT*-1;
-//                }else if(y[i] < HEIGHT){
-//                    y[i] = HEIGHT;
-//                }
-//                if(x[i] < WIDTH*-1){
-//                    x[i] = WIDTH*-1;
-//                }else if(x[i] < WIDTH){
-//                    x[i] = WIDTH;
-//                }
-//            }
         }
         if(count >= x.length){
            draw = false;
         }
     }
+    /*
+        * Rotates the 3D world about the Z (vertical) axis.
+    */
     public void rotateZ(Camera cam){
         double xDist,yDist;
         double a,b;
@@ -204,6 +223,9 @@ public class Face{
             y[i] = (a + b + cam.getY());
         }
     }
+    /*
+        * Rotates the 3D world about the X (horizontal and across the camera's view) axis.
+    */
     public void rotateX(Camera cam){
         double yDist,zDist;
         double a,b;
@@ -233,6 +255,10 @@ public class Face{
             draw = false;
         }
     }
+    /*
+        * Calculates the distance of a face to the camera.
+        Averages the center of the face from all its vertices
+    */
     public double dist(Camera cam){
         double output;
         
@@ -255,17 +281,12 @@ public class Face{
         output = Math.sqrt(Math.pow(xDist,2) + Math.pow(yDist,2) + Math.pow(zDist,2));
         return output;
     }
+    /*
+        * Draws the face to the screen
+    */
     public void draw(Graphics g, Camera cam){
         ArrayList<Vertex> vertices = new ArrayList<>();
         int sc = cam.getScale();
-        
-        // for(int xi=0;xi<x.length;xi++){
-        //     if(x[xi] == 2147483647){
-        //         System.out.println("END");
-        //         System.exit(0);
-        //     }
-        //     System.out.println(x[xi]);
-        // }
             
         g.setColor(Color.green);
 
@@ -297,6 +318,10 @@ public class Face{
             }
         }
     }
+    /*
+        * A helper method to the draw() method.
+        This draws a single line to the screen.
+    */
     public void line(Graphics g, int sc, int xScreen, int yScreen, Vertex v, Camera cam){
         if(!draw){
             return;
@@ -304,36 +329,10 @@ public class Face{
         double slope = 0;
         if(v.getX() != xScreen){
             slope = (v.getY() - yScreen)/(v.getX() - xScreen);
-            // slope = (yScreen - v.getY())/(xScreen - (v.getX()));
         }
-
-        // int xDist = Math.abs(xScreen - (int)v.getX());
 
         double b = xScreen * slope;
         b = yScreen - b;
-
-        // double newY = slope * xScreen + b;
-
-        // int line_y = (int)(size((int)v.getY(),sc)*slope + b);
-        // System.out.println((size((int)v.getY(),sc)) + ", " + v.getY() + ", " + slope + ", " + b);
-
-        // int smallX, smallY;
-        // int largeX, largeY;
-
-        // if(xScreen < (int)v.getX()){
-        //     smallX = xScreen;
-        //     largeX = (int)v.getX();
-        // }else{
-        //     largeX = xScreen;
-        //     smallX = (int)v.getX();
-        // }
-        // if(yScreen < (int)v.getY()){
-        //     smallY = yScreen;
-        //     largeY = (int)v.getY();
-        // }else{
-        //     largeY = yScreen;
-        //     smallY = (int)v.getY();
-        // }
         
         Vertex small;
         Vertex large;
@@ -353,10 +352,6 @@ public class Face{
             small.setY((int)v.getY());
             large.setY(yScreen);
         }
-        
-        // System.out.println("===");
-        // System.out.println(small.toString());
-        // System.out.println(large.toString());
 
         if(small.getX() < 0){
             small.setX(0);
@@ -380,57 +375,11 @@ public class Face{
             large.setY(cam.getHeight());
         }
         
-        /*
-        if(smallX < 0){
-            smallX = 0;
-        }else if(smallX > cam.getWidth()){
-           smallX = cam.getWidth();
-        }else if(smallY < 0){
-            smallY = 0;
-        }else if(smallY > cam.getHeight()){
-            smallY = cam.getHeight();
-        }
-
-        if(largeX < 0){
-            largeX = 0;
-        }else if(largeX > cam.getWidth()){
-            largeX = cam.getWidth();
-        }else if(largeY < 0){
-            largeY = 0;
-        }else if(largeY > cam.getHeight()){
-            largeY = cam.getHeight();
-        }
-        */
-        // System.out.println(large.getX());
-        
-        // for(int i=0;i<cam.getWidth();i+=sc){
-        
         for(int i=(int)small.getX();i<=(int)(large.getX());i+=sc){
-        //for(int i=0;i<end;i++)
         
-        // for(int i=smallX;i<largeX;i++){
-            // if(i > small.getX() && i < large.getX()){
-                // if(Math.random() < 0.001)//{
-                //     if(i == 0){
-                //         System.out.println(small.getX());
-                //         // System.pause(0);
-                //     }else{
-                //         // System.out.println("Nothing");
-                //     }
-                // }
-                // for(int j=(int)small.getY();j<(int)(large.getY());j+=sc)
-                // System.out.println(small.getY() + ", " + large.getY());
-            // if(slope > 0){
                 int now = size((int)(i * slope + b),sc);
                 int next = size((int)((i+sc) * slope + b),sc);
-            //     System.out.println(now + ", " + next);
-                
-                // if(Math.random() < 0.001)
-                //     System.out.println(slope + ", " + i + ", " + next + ", " + now);
-                
-                // for(int j=0;j<next - now;j+=sc){
-                // if(j != now)
-                //     System.out.println(j + ", " + now + ", " + next);
+            
                 if(now > large.getY()){
                     now = size((int)large.getY(),sc);
                 }else if(now < small.getY()){
@@ -455,20 +404,16 @@ public class Face{
                     diff = Math.abs(diff);
                 }
                 
-                // if(diff >= 0){
-                    for(int j=0;j<=diff;j+=sc){
-                        g.fillRect(size(i,sc),now+(j*flip),sc,sc);
-                    }
-                // }else{
-                //     g.fillRect(size(i,sc),now,sc,sc);
-                // }
-                // }
-                // g.fillRect(500,250,sc,sc);
-            // }
-                // }
-            // }
+                for(int j=0;j<=diff;j+=sc){
+                    g.fillRect(size(i,sc),now+(j*flip),sc,sc);
+                }
         }
     }
+    /*
+        * Helper method to the draw() method.
+
+        * Adjusts the scale of each pixel on the screen.
+    */
     public int size(int n, int sc){
         int output = n/sc*sc;
         return output;

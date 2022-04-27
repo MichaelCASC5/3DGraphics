@@ -1,4 +1,8 @@
 public class Vertex{
+    /*
+        * Declaration and Inilization
+    */
+
     double x,y,z;
     
     public Vertex(){
