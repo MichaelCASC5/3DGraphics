@@ -1,5 +1,6 @@
 /*
 ========================= ========================= 
+
         * R A D I U M  3 D
         * MICHAEL CALLE, 2022
 
@@ -8,6 +9,7 @@
         * 3D Graphics Framework Software. Eventually,
         this will provide the backbone of a 3D program
         that can be easily repurposed for any other use.
+
 ========================= ========================= 
 */
 import java.awt.*;
@@ -76,6 +78,7 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
     public void paintComponent(Graphics g){
         g.setColor(Color.black);
         g.fillRect(0,0,WIDTH,HEIGHT);
+        
         for(int i=0;i<scene.size();i++){
             scene.get(i).actions(cam);
             scene.get(i).draw(g,cam);
