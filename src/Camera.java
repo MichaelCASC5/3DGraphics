@@ -108,7 +108,12 @@ public class Camera{
     /*
         * CAMERA 3D WORLD SPACE ANGULAR COMPENSATION
     */
-    public void compensation(boolean w, boolean a, boolean s, boolean d){
+    public void compensation(Keys keys){
+        boolean w = keys.getW();
+        boolean a = keys.getA();
+        boolean s = keys.getS();
+        boolean d = keys.getD();
+
         double yaw;
         yaw = getYaw();
         
@@ -188,5 +193,35 @@ public class Camera{
         }
         setY(userY);
         setX(userX);
+
+        /*
+            * Horizontal movement
+        */
+        if(keys.getArL()){ 
+            setYaw(getYaw()-2);
+            // yaw+=2;
+        }
+        if(keys.getArR()){
+            setYaw(getYaw()+2);
+            // yaw-=2;
+        }
+        if(keys.getArU()){
+            setPitch(getPitch()-2);
+            // pitch-=2;
+        }
+        if(keys.getArD()){
+            setPitch(getPitch()+2);
+            // pitch+=2;
+        }
+
+        /*
+            * Vertical movement
+        */
+        if(keys.getSpace()){
+            setZ(getZ()+0.2);
+        }
+        if(keys.getCtrl()){
+            setZ(getZ()-0.2);
+        }
     }
 }

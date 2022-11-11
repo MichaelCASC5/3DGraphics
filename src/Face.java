@@ -301,12 +301,12 @@ public class Face{
             if(i == 0){
                 start = new Vertex(x[i],y[i],0);
             }else{
-                // g.drawLine((int)v.getX(),(int)v.getY(),xScreen,yScreen);
-                line(g,sc,xScreen,yScreen,v,cam);
+                g.drawLine((int)v.getX(),(int)v.getY(),xScreen,yScreen);
+                // line(g,sc,xScreen,yScreen,v,cam);
 
                 if(i == x.length-1){
-                    // g.drawLine((int)start.getX(),(int)start.getY(),xScreen,yScreen);
-                    line(g,sc,xScreen,yScreen,start,cam);
+                    g.drawLine((int)start.getX(),(int)start.getY(),xScreen,yScreen);
+                    // line(g,sc,xScreen,yScreen,start,cam);
                 }
             }
             
@@ -314,7 +314,7 @@ public class Face{
             vertices.add(v);
             
             if(draw){
-                g.fillRect(size(xScreen,sc),size(yScreen,sc),sc,sc);
+                // g.fillRect(size(xScreen,sc),size(yScreen,sc),sc,sc);
             }
         }
     }
