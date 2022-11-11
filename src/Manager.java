@@ -36,13 +36,14 @@ public class Manager{
         ArrayList<Vertex> vertices;
         
         RObject r;
+        r = new RObject();
         Face f;
         
         double[] x;
         double[] y;
         double[] z;
         
-        boolean addScene = false;
+        boolean addFace = false;
 
         Scanner reader;
         String line;
@@ -109,11 +110,11 @@ public class Manager{
                             y = append(y,vertices.get(index).getZ()*-1);
                             z = append(z,vertices.get(index).getY());
                             
-                            addScene = true;
+                            addFace = true;
                         }
                     }
                     
-                    if(addScene){
+                    if(addFace){
                         f = new Face(x,y,z);
                         r.addFace(f);
                         
@@ -121,16 +122,19 @@ public class Manager{
                         y = new double[0];
                         z = new double[0];
 
-                        scene.add(r);
+                        // scene.add(r);
                         
-                        addScene = false;
+                        addFace = false;
                     }
                 }
             }catch(Exception e){
                 e.printStackTrace();
             }
-            
+
+            //At the end of reading the file, that RObject gets added to the scene
+            scene.add(r);
         }
+        
         return scene;
     }
 }

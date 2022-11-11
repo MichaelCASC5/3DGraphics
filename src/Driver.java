@@ -49,7 +49,7 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         
         //Read Scene
         scene = Manager.read("Scene 1");
-        System.out.println("Object Face Count: " + scene.get(0).getFaceCount());
+        System.out.println("First Object Face Count: " + scene.get(0).getFaceCount() + " Scene Size: " + scene.size());
 
         keys = new Keys();
         cam = new Camera();
@@ -80,6 +80,7 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         g.fillRect(0,0,WIDTH,HEIGHT);
         
         for(int i=0;i<scene.size();i++){
+            // System.out.println(scene.size());
             scene.get(i).actions(cam);
             scene.get(i).draw(g,cam);
         }
