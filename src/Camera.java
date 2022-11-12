@@ -199,19 +199,15 @@ public class Camera{
         */
         if(keys.getArL()){ 
             setYaw(getYaw()-2);
-            // yaw+=2;
         }
         if(keys.getArR()){
             setYaw(getYaw()+2);
-            // yaw-=2;
         }
         if(keys.getArU()){
             setPitch(getPitch()-2);
-            // pitch-=2;
         }
         if(keys.getArD()){
             setPitch(getPitch()+2);
-            // pitch+=2;
         }
 
         /*

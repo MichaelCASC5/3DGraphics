@@ -170,29 +170,36 @@ public class Face{
         * Rotates the 3D world about the Z (vertical) axis.
     */
     public void rotateZ(Camera cam){
+        double camX = cam.getX();
+        double camY = cam.getY();
+        double camYaw = cam.getYaw();
+        
         double xDist,yDist;
         double a,b;
         
         for(int i=0;i<x.length;i++){
+            xDist = x[i] - camX;
+            yDist = y[i] - camY;
             
-            xDist = x[i] - cam.getX();
-            yDist = y[i] - cam.getY();
+            a = xDist*Math.cos(camYaw/(180.0/Math.PI));
+            b = yDist*Math.sin(camYaw/(180.0/Math.PI));
             
-            a = xDist*Math.cos(cam.getYaw()/(180.0/Math.PI));
-            b = yDist*Math.sin(cam.getYaw()/(180.0/Math.PI));
+            x[i] = (a - b + camX);
             
-            x[i] = (a - b + cam.getX());
+            a = yDist*Math.cos(camYaw/(180.0/Math.PI));
+            b = xDist*Math.sin(camYaw/(180.0/Math.PI));
             
-            a = yDist*Math.cos(cam.getYaw()/(180.0/Math.PI));
-            b = xDist*Math.sin(cam.getYaw()/(180.0/Math.PI));
-            
-            y[i] = (a + b + cam.getY());
+            y[i] = (a + b + camY);
         }
     }
     /*
         * Rotates the 3D world about the X (horizontal and across the camera's view) axis.
     */
     public void rotateX(Camera cam){
+        double camY = cam.getY();
+        double camZ = cam.getZ();
+        double camPitch = cam.getPitch();
+
         double yDist,zDist;
         double a,b;
         
@@ -200,20 +207,20 @@ public class Face{
         count = 0;
         
         for(int i=0;i<x.length;i++){
-            yDist = y[i] - cam.getY();
-            zDist = zPoints[i] - cam.getZ();
+            yDist = y[i] - camY;
+            zDist = zPoints[i] - camZ;
             
-            a = yDist*Math.cos(cam.getPitch()/(180.0/Math.PI));
-            b = zDist*Math.sin(cam.getPitch()/(180.0/Math.PI));
+            a = yDist*Math.cos(camPitch/(180.0/Math.PI));
+            b = zDist*Math.sin(camPitch/(180.0/Math.PI));
             
-            y[i] = (a - b + cam.getY());
+            y[i] = (a - b + camY);
             
-            a = zDist*Math.cos(cam.getPitch()/(180.0/Math.PI));
-            b = yDist*Math.sin(cam.getPitch()/(180.0/Math.PI));
+            a = zDist*Math.cos(camPitch/(180.0/Math.PI));
+            b = yDist*Math.sin(camPitch/(180.0/Math.PI));
             
-            z[i] = (a + b + cam.getZ());
+            z[i] = (a + b + camZ);
             
-            if(y[i] < cam.getY()){
+            if(y[i] < camY){
                 count++;
             }
         }
@@ -229,25 +236,31 @@ public class Face{
         can be ignored, as they are not neccessary for drawing onto the 2D display.
     */
     public void toscreen(Camera cam){
+        double camX = cam.getX();
+        double camY = cam.getY();
+        double camZ = cam.getZ();
+        double camWidth = cam.getWidth();
+        double camHeight = cam.getHeight();
+
         int count = 0;
         for(int i=0;i<x.length;i++){
             double xDist,yDist,zDist;
-            xDist = x[i] - cam.getX();
-            yDist = y[i] - cam.getY();
-            zDist = z[i] - cam.getZ();
+            xDist = x[i] - camX;
+            yDist = y[i] - camY;
+            zDist = z[i] - camZ;
             
             double parr;
             parr = (1000.0/(yDist));
             parr=Math.abs(parr);
             
-            x[i] = ((cam.getWidth()/2)+(parr*(xDist)));
-            y[i] = (((cam.getHeight()/2)-(parr*zDist)));
+            x[i] = ((camWidth/2)+(parr*(xDist)));
+            y[i] = (((camHeight/2)-(parr*zDist)));
             
             /*
                 Counts if all the vertices of a face stretch beyond the camera's view.
                 If all vertices do, then don't draw the face.
             */
-            if(x[i] < 0 || x[i] > cam.getWidth() || y[i] < 0 || y[i] > cam.getHeight()){
+            if(x[i] < 0 || x[i] > camWidth || y[i] < 0 || y[i] > camHeight){
                 count++;
             }
         }
@@ -260,6 +273,10 @@ public class Face{
         Averages the center of the face from all its vertices
     */
     public double dist(Camera cam){
+        double camX = cam.getX();
+        double camY = cam.getY();
+        double camZ = cam.getZ();
+
         double output;
         
         int xsum=0,ysum=0,zsum=0;
@@ -274,54 +291,158 @@ public class Face{
         
         double xDist,yDist,zDist;
 
-        xDist = xsum - cam.getX();
-        yDist = ysum - cam.getY();
-        zDist = zsum - cam.getZ();
+        xDist = xsum - camX;
+        yDist = ysum - camY;
+        zDist = zsum - camZ;
         
         output = Math.sqrt(Math.pow(xDist,2) + Math.pow(yDist,2) + Math.pow(zDist,2));
         return output;
     }
     /*
-        * Draws the face to the screen
+        * Draws the face to the screen. Each RObject consists of an arraylist of faces.
+
+        * Each face is represented by two arrays of x-coordinates and y coordinates.
+        * Each face is simply a 2D polygon.
+        * The vertices along the circumference of the polygon are stored in a circular 
+        direction going around. When it comes time to draw the polygon to the screen, the
+        algorithm draws a line from one vertex coordinate to the next.
+        *
+        * Drawing a rect:
+        *   2           >           3
+        *   ^                       v
+        *   1 < (extra iteration) < 4
+        *
     */
     public void draw(Graphics g, Camera cam){
-        ArrayList<Vertex> vertices = new ArrayList<>();
-        int sc = cam.getScale();
-            
+        if(!draw){
+            return;
+        }
+        double camWidth = cam.getWidth();
+        double camHeight = cam.getHeight();
+
+        int sc = cam.getScale();  
         g.setColor(Color.green);
 
-        Vertex v = new Vertex();
-        Vertex start = new Vertex();
-        int xScreen,yScreen;
-
+        int firstX = 0;
+        int firstY = 0;
+        
+        int prevX = 0;
+        int prevY = 0;
+        int curX, curY;
         for(int i=0;i<x.length;i++){
-            xScreen = (int)x[i];
-            yScreen = (int)y[i];
+            curX = (int)x[i];
+            curY = (int)y[i];
 
+            //On the first iteration, record the position of the first vertex.
             if(i == 0){
-                start = new Vertex(x[i],y[i],0);
-            }else{
-                g.drawLine((int)v.getX(),(int)v.getY(),xScreen,yScreen);
-                // line(g,sc,xScreen,yScreen,v,cam);
+                firstX = curX;
+                firstY = curY;
+            }
+            //On ensuing iterations, draw a line from the previous vertex to the current vertex.
+            else{
+                g.drawLine(prevX,prevY,curX,curY);
 
+                //On the last iteration, draw a line from the current vertex back to the original first vertex, closing the polygon.
                 if(i == x.length-1){
-                    g.drawLine((int)start.getX(),(int)start.getY(),xScreen,yScreen);
-                    // line(g,sc,xScreen,yScreen,start,cam);
+                    g.drawLine(curX,curY,firstX,firstY);
                 }
             }
             
-            v = new Vertex(xScreen,yScreen,0);
-            vertices.add(v);
-            
-            if(draw){
-                // g.fillRect(size(xScreen,sc),size(yScreen,sc),sc,sc);
+            //Always save the current vertex for the next iteration, in which a line will be draw from this vertex to that one.
+            prevX = curX;
+            prevY = curY;
+
+            //Doesn't let any line that goes off the screen to render.
+            if((prevX < 0 || curX < 0 || prevX > camWidth || curX > camWidth)
+                || (prevY < 0 || curY < 0 || prevY > camHeight || curY > camHeight)
+                ){
+                return;
             }
+            
+            // if(draw){
+            //     g.fillRect(size(curX,sc),size(curY,sc),sc,sc);
+            // }
         }
     }
     /*
         * A helper method to the draw() method.
         This draws a single line to the screen.
     */
+    /*
+    public void line(Graphics g, int sc, int x1, int y1, Vertex v, Camera cam){
+        sc = 1;
+        
+        int x2,y2;
+        x2 = (int)v.getX();
+        y2 = (int)v.getY();
+
+        if(!draw
+            || (x1 < 0 || x2 < 0 || x1 > cam.getWidth() || x2 > cam.getWidth())
+            || (y1 < 0 || y2 < 0 || y1 > cam.getHeight() || y2 > cam.getHeight())
+            ){
+            return;
+        }
+
+        // if(sc == 1){
+        //     g.drawLine(x1,y1,x2,y2);
+        //     return;
+        // }
+
+        int temp = 0;
+        if(x1 > x2){
+            temp = y1;
+            y1 = y2;
+            y2 = temp;
+
+            temp = x1;
+            x1 = x2;
+            x2 = temp;
+        }
+
+        //Calculating Slope
+        double slope = 0;
+        if(x1 != x2){
+            slope = (double)(y2 - y1)/(double)(x2 - x1);
+
+            //Finding Y-intercept y = mx + b<-
+            double b = x1 * slope;
+            b = y1 - b;
+            
+            int ry = 0;
+            for(int i=x1;i<x2;i+=sc){
+                ry = (int)(slope*(double)i + b);
+                
+                int nexty = 0;
+                if(i < x2 - 1){
+                    nexty = (int)(slope*(double)(i+sc) + b) - ry;
+                }
+                if(nexty > 0){
+                    // g.fillRect(i - i%sc,ry - ry%sc,sc,sc);
+                    for(int j=ry;j<=ry+nexty*1;j+=sc){
+                        g.fillRect(i - i%sc,j - j%sc,sc,sc);
+                    }
+                }else{
+                    for(int j=ry;j>=ry+nexty*1;j-=sc){
+                        g.fillRect(i - i%sc,j - j%sc,sc,sc);
+                    }
+                }
+            }
+        }else{
+            if(y1 > y2){
+                temp = y1;
+                y1 = y2;
+                y2 = temp;
+
+                temp = x1;
+                x1 = x2;
+                x2 = temp;
+            }
+            // for(int i=y1;i<y2;i+=sc){
+            //     g.fillRect(x1 - x1%sc,i - i%sc,sc,sc);
+            // }
+        }
+    }*/
+    /*
     public void line(Graphics g, int sc, int xScreen, int yScreen, Vertex v, Camera cam){
         if(!draw){
             return;
@@ -408,7 +529,7 @@ public class Face{
                     g.fillRect(size(i,sc),now+(j*flip),sc,sc);
                 }
         }
-    }
+    }*/
     /*
         * Helper method to the draw() method.
 
