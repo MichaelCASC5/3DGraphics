@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import java.awt.image.BufferedImage;
+
 public class Face{
     /*
         * Declaration and instantiation.
@@ -12,7 +14,7 @@ public class Face{
     */
     private double[] xPoints, yPoints, zPoints; //global
     private double[] x,y,z;                     //local
-    
+
     private boolean draw;
     
     /*
@@ -313,7 +315,7 @@ public class Face{
         *   1 < (extra iteration) < 4
         *
     */
-    public void draw(Graphics g, Camera cam){
+    public void draw(Graphics g, BufferedImage canvas, Camera cam){
         if(!draw){
             return;
         }
@@ -341,10 +343,12 @@ public class Face{
             //On ensuing iterations, draw a line from the previous vertex to the current vertex.
             else{
                 g.drawLine(prevX,prevY,curX,curY);
+                // line(g,canvas,cam,prevX,prevY,curX,curY);
 
                 //On the last iteration, draw a line from the current vertex back to the original first vertex, closing the polygon.
                 if(i == x.length-1){
                     g.drawLine(curX,curY,firstX,firstY);
+                    // line(g,canvas,cam,curX,curY,firstX,firstY);
                 }
             }
             
@@ -368,6 +372,76 @@ public class Face{
         * A helper method to the draw() method.
         This draws a single line to the screen.
     */
+    public void line(Graphics g, BufferedImage canvas, Camera cam, int prevX, int prevY, int curX, int curY){
+        double camWidth = cam.getWidth();
+        double camHeight = cam.getHeight();
+
+        // g.drawLine(prevX,prevY,curX,curY);
+
+        //Calculating Slope
+        double slope = 0;
+        if(prevX != curX){
+            slope = (double)(curY - prevY)/(double)(curX - prevX);
+
+            //Finding Y-intercept y = mx + b<-
+            double b = prevX * slope;
+            b = prevY - b;
+
+            int y;
+            Color c = Color.red;
+            int color = c.getRGB();
+
+            //Makes sure the for loop always runs from left to right
+            int larger;
+            int smaller;
+
+            if(curX > prevX){
+                larger = curX;
+                smaller = prevX;
+            }else{
+                larger = prevX;
+                smaller = curX;
+            }
+
+            //If statements separate loops that draw from left to right and up to down
+            if(Math.abs(slope) < 1){
+
+            //Draws from left to right
+            for(int i=smaller;i<larger;i++){
+                y = (int)(slope*i + b);
+                // g.fillRect(i,y,1,1);
+                
+                if(i > 0 && i < camWidth && y > 0 && y < camHeight){
+                    canvas.setRGB(i, y, color);
+                    // g.fillRect(i,y,2,2);
+                }
+            }
+            
+            }else{
+                // Draws from top to bottom
+                if(curY > prevY){
+                    larger = curY;
+                    smaller = prevY;
+                }else{
+                    larger = prevY;
+                    smaller = curY;
+                }
+
+                for(int i=smaller;i<larger;i++){
+                    y = (int)((-1 / slope)*i - (b + (1 / slope)));
+                    // y = (int)(slope*i + b);
+                    // g.fillRect(y,i,1,1);
+                    
+                    if(i > 0 && i < camHeight && y > 0 && y < camWidth){
+                        canvas.setRGB(y, i, color);
+                        // g.fillRect(i,y,2,2);
+                    }
+                }
+                // g.drawLine(prevX,prevY,curX,curY);
+            }
+            // g.setRGB(100, 100, 255);
+        }
+    }
     /*
     public void line(Graphics g, int sc, int x1, int y1, Vertex v, Camera cam){
         sc = 1;

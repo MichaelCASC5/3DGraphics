@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import java.awt.image.BufferedImage;
+
 public class RObject{
     /*
         * Declaration and instantiation.
@@ -54,9 +56,9 @@ public class RObject{
     /*
         * Draws RObject to screen, by drawing each face.
     */
-    public void draw(Graphics g, Camera cam){
+    public void draw(Graphics g, BufferedImage canvas, Camera cam){
         for(int i=0;i<faces.size();i++){
-            faces.get(i).draw(g,cam);
+            faces.get(i).draw(g,canvas,cam);
         }
     }
 }

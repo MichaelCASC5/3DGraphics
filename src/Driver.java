@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 
+import java.awt.image.BufferedImage;
+
 public class Driver extends JComponent implements KeyListener, MouseListener, MouseMotionListener{
     /*
         * Declaring variables and objects
@@ -35,6 +37,8 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
     private Sky sky;
     
     private ArrayList<RObject> scene;
+
+    private BufferedImage canvas;
     
     public Driver(){
         /*
@@ -56,6 +60,8 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         cam.setRes(WIDTH,HEIGHT,5);
         
         sky = new Sky(HEIGHT,WIDTH);
+
+        canvas = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
         
         //Setting up the GUI
         JFrame gui = new JFrame();
@@ -76,14 +82,31 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         * Paint to Canvas
     */
     public void paintComponent(Graphics g){
+        //Clears canvas from previous frame
+        canvas = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+
+        //Drawing background
         g.setColor(Color.black);
         g.fillRect(0,0,WIDTH,HEIGHT);
         
+        //Drawing objects in scene
         for(int i=0;i<scene.size();i++){
-            // System.out.println(scene.size());
             scene.get(i).actions(cam);
-            scene.get(i).draw(g,cam);
+            scene.get(i).draw(g,canvas,cam);
         }
+
+        // Color c = Color.red;
+        // int color = c.getRGB();
+        // for(int i=0;i<WIDTH/2;i++){
+        //     for(int j=0;j<HEIGHT/2;j++){
+        //         canvas.setRGB(i, j, color);
+        //     }
+        // }
+
+        //Drawing canvas
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.drawImage(canvas, null, null);
     }
     /*
         * Game Logic
