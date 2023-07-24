@@ -15,6 +15,8 @@ public class Face{
     private double[] xPoints, yPoints, zPoints; //global
     private double[] x,y,z;                     //local
 
+    private Vertex normG, normL;
+
     private boolean draw;
     
     /*
@@ -28,6 +30,9 @@ public class Face{
         x = new double[0];
         y = new double[0];
         z = new double[0];
+
+        normG = new Vertex();
+        normL = new Vertex();
         
         draw = false;
     }
@@ -36,7 +41,7 @@ public class Face{
 
         * Accepts three arrays. Each for the x, y, and z coordinates of all vertices that form the array.
     */    
-    public Face(double[] a, double[] b, double[] c){
+    public Face(double[] a, double[] b, double[] c, Vertex d){
         xPoints = new double[a.length];
         yPoints = new double[b.length];
         zPoints = new double[c.length];
@@ -44,6 +49,9 @@ public class Face{
         x = new double[a.length];
         y = new double[b.length];
         z = new double[c.length];
+
+        normG = new Vertex();
+        normL = new Vertex();
         
         setArray(xPoints,a);
         setArray(yPoints,b);
@@ -51,11 +59,15 @@ public class Face{
         setArray(x,a);
         setArray(y,b);
         setArray(z,c);
+
+        normG.setAll(d);
+        normL.setAll(d);
         
         draw = false;
     }
     /*
         * Accessor and mutator methods
+        * Mutator Methods:
     */
     public void setX(double[] n){
         xPoints = new double[n.length];
@@ -84,6 +96,15 @@ public class Face{
             z[i] = n[i];
         }
     }
+    public void setNormalG(Vertex v){
+        normG = v;
+    }
+    public void setNormalL(Vertex v){
+        normL = v;
+    }
+    /*
+        * Accessor Methods:
+    */
     public double[] getXPoints(){
         return xPoints;
     }
@@ -101,6 +122,12 @@ public class Face{
     }
     public double[] getZ(){
         return z;
+    }
+    public Vertex getNormalG(){
+        return normG;
+    }
+    public Vertex getNormalL(){
+        return normL;
     }
     /*
         * Set all geometry of a face to that of another face.
@@ -123,6 +150,9 @@ public class Face{
         setArray(x,f.getX());
         setArray(y,f.getY());
         setArray(z,f.getZ());
+
+        normG.setAll(f.getNormalG());
+        normL.setAll(f.getNormalL());
     }
     /*
         * Print statements
@@ -158,7 +188,7 @@ public class Face{
         }
     }
     /*
-        * Resets the local array to the global array.
+        * Resets the local data to the global data.
     */
     public void reset(){
         for(int i=0;i<xPoints.length;i++){
@@ -166,6 +196,7 @@ public class Face{
             y[i] = yPoints[i];
             z[i] = zPoints[i];
         }
+        normL.setAll(normG);
         draw = true;
     }
     /*
@@ -226,6 +257,7 @@ public class Face{
                 count++;
             }
         }
+        //If all vertices of the face are behind the y position of the camera, do not draw the face.
         if(count >= x.length){
             draw = false;
         }
@@ -244,8 +276,16 @@ public class Face{
         double camWidth = cam.getWidth();
         double camHeight = cam.getHeight();
 
+        /*
+            * Computing normal's relationship with the camera.
+            * If normal faces away from the camera, don't draw the face.
+            * Note: The vector heading of the virtual camera is always [0,1,0]
+        */
+        
+
         int count = 0;
         for(int i=0;i<x.length;i++){
+            //Handling Translations
             double xDist,yDist,zDist;
             xDist = x[i] - camX;
             yDist = y[i] - camY;
@@ -259,13 +299,14 @@ public class Face{
             y[i] = (((camHeight/2)-(parr*zDist)));
             
             /*
-                Counts if all the vertices of a face stretch beyond the camera's view.
-                If all vertices do, then don't draw the face.
+                * Counts if all the vertices of a face stretch beyond the camera's view.
+                * If all vertices do, then don't draw the face.
             */
             if(x[i] < 0 || x[i] > camWidth || y[i] < 0 || y[i] > camHeight){
                 count++;
             }
         }
+
         if(count >= x.length){
            draw = false;
         }
@@ -316,6 +357,7 @@ public class Face{
         *
     */
     public void draw(Graphics g, BufferedImage canvas, Camera cam){
+        // System.out.println(normG);
         if(!draw){
             return;
         }

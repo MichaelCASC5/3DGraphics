@@ -34,6 +34,7 @@ public class Manager{
         File[] files = directory.listFiles();
         
         ArrayList<Vertex> vertices;
+        ArrayList<Vertex> normals;
         
         RObject r;
         r = new RObject();
@@ -48,6 +49,8 @@ public class Manager{
         Scanner reader;
         String line;
         Vertex v;
+        Vertex n;
+        int normalID;
         for(int i=0;i<files.length;i++){
             System.out.println(files[i].getName());
             r = new RObject();
@@ -57,6 +60,7 @@ public class Manager{
             z = new double[0];
             
             vertices = new ArrayList<>();
+            normals = new ArrayList<>();
             
             try{
                 reader = new Scanner(files[i]);
@@ -64,6 +68,8 @@ public class Manager{
                 int num;
                 while(reader.hasNextLine()){
                     v = new Vertex();
+                    n = new Vertex();
+                    normalID = 0;
                     
                     line = reader.nextLine();
                     if(line != ""){
@@ -82,6 +88,22 @@ public class Manager{
                             
                             vertices.add(v);
                         }
+
+                        if(line.substring(0,3).equals("vn ")){
+                            line = line.substring(3);
+                            num = line.indexOf(" ");
+                            n.setX(Double.parseDouble(line.substring(0,num)));
+                            line = line.substring(num+1);
+                            
+                            num = line.indexOf(" ");
+                            n.setY(Double.parseDouble(line.substring(0,num)));
+                            line = line.substring(num+1);
+                            
+                            num = line.length();
+                            n.setZ(Double.parseDouble(line.substring(0,num)));
+                            
+                            normals.add(n);
+                        }
                         
                         if(line.substring(0,2).equals("f ")){
                             line = line.substring(2);
@@ -90,14 +112,12 @@ public class Manager{
                             String face;
                             boolean collect;
                             collect = true;
-                            // System.out.println(line);
                             while(collect){
                                 if(num != -1){
                                     face = line.substring(0,num);
                                     line = line.substring(num+1);
                                     num = line.indexOf(" ");
                                 }else{
-                                    // face = line.substring(0,line.length());
                                     face = line;
                                     collect = false;
                                 }
@@ -114,16 +134,17 @@ public class Manager{
                                 */
                                 int index;
                                 index = face.indexOf("/");
+                                normalID = Integer.parseInt(face.substring(index+2,index+3)) - 1;
                                 if(index == -1){
                                     index = face.length();
                                 }
-                                // System.out.println("\n\n" + line + "\n" + index + "\n" + face);
+
                                 face = face.substring(0,index);
                                 index = Integer.parseInt(face);
                                 index--;
                                 
                                 x = append(x,vertices.get(index).getX());
-                                y = append(y,vertices.get(index).getZ()*-1);
+                                y = append(y,vertices.get(index).getZ()*-1);//Unknown cause for mismatch
                                 z = append(z,vertices.get(index).getY());
                                 
                                 addFace = true;
@@ -131,16 +152,18 @@ public class Manager{
                         }
                         
                         if(addFace){
-                            f = new Face(x,y,z);
-                            r.addFace(f);
+                            if(normals.size() <= 0){
+                                normals.add(new Vertex());
+                            }
                             
+                            f = new Face(x,y,z,normals.get(normalID));
+                            r.addFace(f);
                             x = new double[0];
                             y = new double[0];
                             z = new double[0];
-
-                            // scene.add(r);
                             
                             addFace = false;
+                            normalID = 0;
                         }
                     }
                 }
@@ -148,7 +171,12 @@ public class Manager{
                 e.printStackTrace();
             }
 
-            //At the end of reading the file, that RObject gets added to the scene
+            //At the end of reading the file:
+            //Clear Arraylists
+            vertices.clear();
+            normals.clear();
+            
+            //That RObject gets added to the scene.
             scene.add(r);
         }
         

@@ -124,12 +124,13 @@ public class Camera{
         double comp;
         comp = (yaw%90)/90.0;
         
-        //Speed
+        //Comp and Add should be the same value. Comp changes depending on the camera angle; add is speed.
+        //Angular Compensation
         comp*=0.2;
         
-        //Add
+        //Magnitude of movement, or speed
         double add = 0.2;
-        
+
         //Key Movements
         if(w){//FORWARD
             if(yaw >= 0 && yaw < 90){//Top right

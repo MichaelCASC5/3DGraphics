@@ -36,4 +36,9 @@ public class Vertex{
     public String toString(){
         return "" + x + ", " + y + ", " + z;
     }
+    public void setAll(Vertex v){
+        x = v.getX();
+        y = v.getY();
+        z = v.getZ();
+    }
 }
