@@ -10,14 +10,18 @@ public class Manager{
         * Helper method to the read() method.
         * Append vertices to new face generated
     */
-    public static double[] append(double[] a, double n){
-        double[] output = new double[a.length+1];
+    public static Vertex[] append(Vertex[] a, Vertex n){
+        Vertex[] output = new Vertex[a.length+1];
         
-        for(int i=0;i<a.length;i++){
-            output[i] = a[i];
+        for(int i=0;i<output.length;i++){
+            output[i] = new Vertex();
+            
+            if(i < output.length - 1){
+                output[i].setAll(a[i]);
+            }else{
+                output[output.length-1].setAll(n);
+            }
         }
-        
-        output[output.length-1] = n;
         
         return output;
     }
@@ -25,45 +29,44 @@ public class Manager{
         * Reading Files
     */
     public static ArrayList<RObject> read(String d){
-        ArrayList<RObject> scene;
-        scene = new ArrayList<>();
-
+        //Setting up file reader
         System.out.println(System.getProperty("user.dir"));
         File directory = new File("C:\\Users\\micha\\Documents\\NetBeansProjects\\Radium Engine\\" + d);
-        
         File[] files = directory.listFiles();
+
+        //Setting up scene
+        ArrayList<RObject> scene;
+        scene = new ArrayList<>();
         
-        ArrayList<Vertex> vertices;
-        ArrayList<Vertex> normals;
-        
+        //Setting up the RObject with the face and vertex class that will be used to push data into it
         RObject r;
         r = new RObject();
         Face f;
+        ArrayList<Vertex> vertices;
+        ArrayList<Vertex> normals;
+        Vertex[] collector;
         
-        double[] x;
-        double[] y;
-        double[] z;
-        
-        boolean addFace = false;
-
-        Scanner reader;
-        String line;
+        //Setting up data that will be scrapped from file
         Vertex v;
         Vertex n;
         int normalID;
+        boolean addFace;
+
+        //Setting up reading vars
+        Scanner reader;
+        String line;
+
         for(int i=0;i<files.length;i++){
             System.out.println(files[i].getName());
             r = new RObject();
             
-            x = new double[0];
-            y = new double[0];
-            z = new double[0];
-            
             vertices = new ArrayList<>();
             normals = new ArrayList<>();
+            collector = new Vertex[0];
             
             try{
                 reader = new Scanner(files[i]);
+                addFace = false;
                 
                 int num;
                 while(reader.hasNextLine()){
@@ -143,9 +146,13 @@ public class Manager{
                                 index = Integer.parseInt(face);
                                 index--;
                                 
-                                x = append(x,vertices.get(index).getX());
-                                y = append(y,vertices.get(index).getZ()*-1);//Unknown cause for mismatch
-                                z = append(z,vertices.get(index).getY());
+                                Vertex collector_input = new Vertex(
+                                    vertices.get(index).getX(),
+                                    vertices.get(index).getZ()*-1,
+                                    vertices.get(index).getY()
+                                );
+                                
+                                collector = append(collector, collector_input);
                                 
                                 addFace = true;
                             }
@@ -155,19 +162,11 @@ public class Manager{
                             if(normals.size() <= 0){
                                 normals.add(new Vertex());
                             }
-
-                            //TEMPORARY INSTALLMENT. This will be overhauled with a Vertex list soon.
-                            Vertex[] faceVertices = new Vertex[x.length];
-                            for(int j=0;j<x.length;j++){
-                                faceVertices[j] = new Vertex(x[j],y[j],z[j]);
-                            }
                             
-                            f = new Face(faceVertices,normals.get(normalID));
+                            f = new Face(collector,normals.get(normalID));
                             r.addFace(f);
 
-                            x = new double[0];
-                            y = new double[0];
-                            z = new double[0];
+                            collector = new Vertex[0];
                             
                             addFace = false;
                             normalID = 0;

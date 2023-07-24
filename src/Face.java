@@ -33,8 +33,6 @@ public class Face{
     }
     /*
         * Parameterized Constructor
-
-        * Accepts three arrays. Each for the x, y, and z coordinates of all vertices that form the array.
     */    
     public Face(Vertex[] v, Vertex n){
         global = new Vertex[v.length];
@@ -53,41 +51,7 @@ public class Face{
     }
     /*
         * Accessor and mutator methods
-        * Mutator Methods:
-    *//*
-    public void setX(double[] n){
-        xPoints = new double[n.length];
-        x = new double[n.length];
-        
-        for(int i=0;i<n.length;i++){
-            xPoints[i] = n[i];
-            x[i] = n[i];
-        }
-    }
-    public void setY(double[] n){
-        yPoints = new double[n.length];
-        y = new double[n.length];
-        
-        for(int i=0;i<n.length;i++){
-            yPoints[i] = n[i];
-            y[i] = n[i];
-        }
-    }
-    public void setZ(double[] n){
-        zPoints = new double[n.length];
-        z = new double[n.length];
-        
-        for(int i=0;i<n.length;i++){
-            zPoints[i] = n[i];
-            z[i] = n[i];
-        }
-    }*/
-    public void setNormalG(Vertex v){
-        normG = v;
-    }
-    public void setNormalL(Vertex v){
-        normL = v;
-    }
+    */
     /*
         * Accessor Methods:
     */
@@ -96,31 +60,38 @@ public class Face{
     }
     public Vertex[] getLocal(){
         return local;
-    }/*
-    public double[] getYPoints(){
-        return yPoints;
     }
-    public double[] getZPoints(){
-        return zPoints;
-    }
-    public double[] getX(){
-        return x;
-    }
-    public double[] getY(){
-        return y;
-    }
-    public double[] getZ(){
-        return z;
-    }*/
     public Vertex getNormalG(){
         return normG;
     }
     public Vertex getNormalL(){
         return normL;
     }
+    public boolean getDraw(){
+        return draw;
+    }
+    /*
+        * Mutator Methods:
+    */
+    public void setGlobal(Vertex[] v){
+        global = new Vertex[v.length];
+        setArray(global,v);
+    }
+    public void setLocal(Vertex[] v){
+        local = new Vertex[v.length];
+        setArray(local,v);
+    }
+    public void setNormalG(Vertex v){
+        normG = v;
+    }
+    public void setNormalL(Vertex v){
+        normL = v;
+    }
+    public void setDraw(boolean b){
+        draw = b;
+    }
     /*
         * Set all geometry of a face to that of another face.
-
         * Accepts a Face object.
     */
     public void setAll(Face f){
@@ -135,28 +106,21 @@ public class Face{
     }
     /*
         * Print statements
-    *//*
-    public void printXP(){
-        for(int i=0;i<xPoints.length;i++){
-            System.out.print(xPoints[i] + " ");
+    */
+    public void printGlobal(){
+        for(int i=0;i<global.length;i++){
+            System.out.print(global[i] + " ");
         }
         System.out.println();
     }
-    public void printYP(){
-        for(int i=0;i<yPoints.length;i++){
-            System.out.print(yPoints[i] + " ");
+    public void printLocal(){
+        for(int i=0;i<local.length;i++){
+            System.out.print(local[i] + " ");
         }
         System.out.println();
     }
-    public void printZP(){
-        for(int i=0;i<zPoints.length;i++){
-            System.out.print(zPoints[i] + " ");
-        }
-        System.out.println();
-    }*/
     /*
         * Simple method that sets the contents of one array to that of another array.
-
         * Different from setting one array equal to another, which will pass the reference
     */
     public void setArray(Vertex[] a, Vertex[] b){
@@ -167,6 +131,11 @@ public class Face{
             }
         }
     }
+
+
+    // * * * BEGINNING 3D WORLD SPACE MATHEMATICAL COMPUTATION OF ROTATIONS, TRANSLATIONS, AND PROJECTION. * * *
+
+
     /*
         * Resets the local data to the global data.
     */
@@ -219,7 +188,7 @@ public class Face{
         
         for(int i=0;i<local.length;i++){
             yDist = local[i].getY() - camY;
-            zDist = global[i].getZ() - camZ; //INVESTIGATE. WHY SUDDEN GLOBAL?
+            zDist = local[i].getZ() - camZ; //Edited from global to local
             
             a = yDist*Math.cos(camPitch/(180.0/Math.PI));
             b = zDist*Math.sin(camPitch/(180.0/Math.PI));
@@ -259,22 +228,21 @@ public class Face{
             * If normal faces away from the camera, don't draw the face.
             * Note: The vector heading of the virtual camera is always [0,1,0]
         */
-        
 
         int count = 0;
         for(int i=0;i<local.length;i++){
             //Handling Translations
-            double xDist,yDist,zDist;
-            xDist = local[i].getX() - camX;
-            yDist = local[i].getY() - camY;
-            zDist = local[i].getZ() - camZ;
+            Vertex dist = new Vertex(
+                local[i].getX() - camX,
+                local[i].getY() - camY,
+                local[i].getZ() - camZ
+            );
             
-            double parr;
-            parr = (1000.0/(yDist));
-            parr=Math.abs(parr);
+            //Computing Parralax
+            double parr = Math.abs(1000.0/dist.getY());
             
-            local[i].setX((camWidth/2)+(parr*(xDist)));
-            local[i].setY(((camHeight/2)-(parr*zDist)));
+            local[i].setX(camWidth/2 + parr*dist.getX());
+            local[i].setY(camHeight/2 - parr*dist.getZ());
             
             /*
                 * Counts if all the vertices of a face stretch beyond the camera's view.
