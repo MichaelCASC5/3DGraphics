@@ -12,8 +12,8 @@ public class Face{
     /*
         * Global and local coordinate arrays.
     */
-    private double[] xPoints, yPoints, zPoints; //global
-    private double[] x,y,z;                     //local
+    private Vertex[] global; //global coordinates
+    private Vertex[] local; //local coordinates
 
     private Vertex normG, normL;
 
@@ -23,13 +23,8 @@ public class Face{
         * Default Constructor
     */
     public Face(){
-        xPoints = new double[0];
-        yPoints = new double[0];
-        zPoints = new double[0];
-        
-        x = new double[0];
-        y = new double[0];
-        z = new double[0];
+        global = new Vertex[0];
+        local = new Vertex[0];
 
         normG = new Vertex();
         normL = new Vertex();
@@ -41,34 +36,25 @@ public class Face{
 
         * Accepts three arrays. Each for the x, y, and z coordinates of all vertices that form the array.
     */    
-    public Face(double[] a, double[] b, double[] c, Vertex d){
-        xPoints = new double[a.length];
-        yPoints = new double[b.length];
-        zPoints = new double[c.length];
-        
-        x = new double[a.length];
-        y = new double[b.length];
-        z = new double[c.length];
+    public Face(Vertex[] v, Vertex n){
+        global = new Vertex[v.length];
+        local = new Vertex[v.length];
 
         normG = new Vertex();
         normL = new Vertex();
-        
-        setArray(xPoints,a);
-        setArray(yPoints,b);
-        setArray(zPoints,c);
-        setArray(x,a);
-        setArray(y,b);
-        setArray(z,c);
 
-        normG.setAll(d);
-        normL.setAll(d);
+        setArray(global,v);
+        setArray(local,v);
+
+        normG.setAll(n);
+        normL.setAll(n);
         
         draw = false;
     }
     /*
         * Accessor and mutator methods
         * Mutator Methods:
-    */
+    *//*
     public void setX(double[] n){
         xPoints = new double[n.length];
         x = new double[n.length];
@@ -95,7 +81,7 @@ public class Face{
             zPoints[i] = n[i];
             z[i] = n[i];
         }
-    }
+    }*/
     public void setNormalG(Vertex v){
         normG = v;
     }
@@ -105,9 +91,12 @@ public class Face{
     /*
         * Accessor Methods:
     */
-    public double[] getXPoints(){
-        return xPoints;
+    public Vertex[] getGlobal(){
+        return global;
     }
+    public Vertex[] getLocal(){
+        return local;
+    }/*
     public double[] getYPoints(){
         return yPoints;
     }
@@ -122,7 +111,7 @@ public class Face{
     }
     public double[] getZ(){
         return z;
-    }
+    }*/
     public Vertex getNormalG(){
         return normG;
     }
@@ -135,28 +124,18 @@ public class Face{
         * Accepts a Face object.
     */
     public void setAll(Face f){
-        xPoints = new double[f.getXPoints().length];
-        yPoints = new double[f.getYPoints().length];
-        zPoints = new double[f.getZPoints().length];
-        
-        x = new double[f.getXPoints().length];
-        y = new double[f.getYPoints().length];
-        z = new double[f.getZPoints().length];
-        
-        setArray(xPoints,f.getXPoints());
-        setArray(yPoints,f.getYPoints());
-        setArray(zPoints,f.getZPoints());
-        
-        setArray(x,f.getX());
-        setArray(y,f.getY());
-        setArray(z,f.getZ());
+        global = new Vertex[f.getGlobal().length];
+        local = new Vertex[f.getGlobal().length];
+
+        setArray(global,f.getGlobal());
+        setArray(local,f.getLocal());
 
         normG.setAll(f.getNormalG());
         normL.setAll(f.getNormalL());
     }
     /*
         * Print statements
-    */
+    *//*
     public void printXP(){
         for(int i=0;i<xPoints.length;i++){
             System.out.print(xPoints[i] + " ");
@@ -174,16 +153,17 @@ public class Face{
             System.out.print(zPoints[i] + " ");
         }
         System.out.println();
-    }
+    }*/
     /*
         * Simple method that sets the contents of one array to that of another array.
 
         * Different from setting one array equal to another, which will pass the reference
     */
-    public void setArray(double[] a, double[] b){
+    public void setArray(Vertex[] a, Vertex[] b){
         if(a.length == b.length){
             for(int i=0;i<a.length;i++){
-                a[i] = b[i];
+                a[i] = new Vertex();
+                a[i].setAll(b[i]);
             }
         }
     }
@@ -191,10 +171,8 @@ public class Face{
         * Resets the local data to the global data.
     */
     public void reset(){
-        for(int i=0;i<xPoints.length;i++){
-            x[i] = xPoints[i];
-            y[i] = yPoints[i];
-            z[i] = zPoints[i];
+        for(int i=0;i<global.length;i++){
+            local[i].setAll(global[i]);
         }
         normL.setAll(normG);
         draw = true;
@@ -210,19 +188,19 @@ public class Face{
         double xDist,yDist;
         double a,b;
         
-        for(int i=0;i<x.length;i++){
-            xDist = x[i] - camX;
-            yDist = y[i] - camY;
+        for(int i=0;i<local.length;i++){
+            xDist = local[i].getX() - camX;
+            yDist = local[i].getY() - camY;
             
             a = xDist*Math.cos(camYaw/(180.0/Math.PI));
             b = yDist*Math.sin(camYaw/(180.0/Math.PI));
             
-            x[i] = (a - b + camX);
+            local[i].setX(a - b + camX);
             
             a = yDist*Math.cos(camYaw/(180.0/Math.PI));
             b = xDist*Math.sin(camYaw/(180.0/Math.PI));
             
-            y[i] = (a + b + camY);
+            local[i].setY(a + b + camY);
         }
     }
     /*
@@ -239,26 +217,26 @@ public class Face{
         int count;
         count = 0;
         
-        for(int i=0;i<x.length;i++){
-            yDist = y[i] - camY;
-            zDist = zPoints[i] - camZ;
+        for(int i=0;i<local.length;i++){
+            yDist = local[i].getY() - camY;
+            zDist = global[i].getZ() - camZ; //INVESTIGATE. WHY SUDDEN GLOBAL?
             
             a = yDist*Math.cos(camPitch/(180.0/Math.PI));
             b = zDist*Math.sin(camPitch/(180.0/Math.PI));
             
-            y[i] = (a - b + camY);
+            local[i].setY(a - b + camY);
             
             a = zDist*Math.cos(camPitch/(180.0/Math.PI));
             b = yDist*Math.sin(camPitch/(180.0/Math.PI));
             
-            z[i] = (a + b + camZ);
+            local[i].setZ(a + b + camZ);
             
-            if(y[i] < camY){
+            if(local[i].getY() < camY){
                 count++;
             }
         }
         //If all vertices of the face are behind the y position of the camera, do not draw the face.
-        if(count >= x.length){
+        if(count >= local.length){
             draw = false;
         }
     }
@@ -284,30 +262,30 @@ public class Face{
         
 
         int count = 0;
-        for(int i=0;i<x.length;i++){
+        for(int i=0;i<local.length;i++){
             //Handling Translations
             double xDist,yDist,zDist;
-            xDist = x[i] - camX;
-            yDist = y[i] - camY;
-            zDist = z[i] - camZ;
+            xDist = local[i].getX() - camX;
+            yDist = local[i].getY() - camY;
+            zDist = local[i].getZ() - camZ;
             
             double parr;
             parr = (1000.0/(yDist));
             parr=Math.abs(parr);
             
-            x[i] = ((camWidth/2)+(parr*(xDist)));
-            y[i] = (((camHeight/2)-(parr*zDist)));
+            local[i].setX((camWidth/2)+(parr*(xDist)));
+            local[i].setY(((camHeight/2)-(parr*zDist)));
             
             /*
                 * Counts if all the vertices of a face stretch beyond the camera's view.
                 * If all vertices do, then don't draw the face.
             */
-            if(x[i] < 0 || x[i] > camWidth || y[i] < 0 || y[i] > camHeight){
+            if(local[i].getX() < 0 || local[i].getX() > camWidth || local[i].getY() < 0 || local[i].getY() > camHeight){
                 count++;
             }
         }
 
-        if(count >= x.length){
+        if(count >= local.length){
            draw = false;
         }
     }
@@ -323,14 +301,14 @@ public class Face{
         double output;
         
         int xsum=0,ysum=0,zsum=0;
-        for(int i=0;i<xPoints.length;i++){
-            xsum+=xPoints[i];
-            ysum+=yPoints[i];
-            zsum+=zPoints[i];
+        for(int i=0;i<global.length;i++){
+            xsum+=global[i].getX();
+            ysum+=global[i].getY();
+            zsum+=global[i].getZ();
         }
-        xsum/=xPoints.length;
-        ysum/=yPoints.length;
-        zsum/=zPoints.length;
+        xsum/=global.length;
+        ysum/=global.length;
+        zsum/=global.length;
         
         double xDist,yDist,zDist;
 
@@ -373,9 +351,9 @@ public class Face{
         int prevX = 0;
         int prevY = 0;
         int curX, curY;
-        for(int i=0;i<x.length;i++){
-            curX = (int)x[i];
-            curY = (int)y[i];
+        for(int i=0;i<local.length;i++){
+            curX = (int)local[i].getX();
+            curY = (int)local[i].getY();
 
             //On the first iteration, record the position of the first vertex.
             if(i == 0){
@@ -388,7 +366,7 @@ public class Face{
                 // line(g,canvas,cam,prevX,prevY,curX,curY);
 
                 //On the last iteration, draw a line from the current vertex back to the original first vertex, closing the polygon.
-                if(i == x.length-1){
+                if(i == local.length-1){
                     g.drawLine(curX,curY,firstX,firstY);
                     // line(g,canvas,cam,curX,curY,firstX,firstY);
                 }

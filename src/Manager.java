@@ -155,9 +155,16 @@ public class Manager{
                             if(normals.size() <= 0){
                                 normals.add(new Vertex());
                             }
+
+                            //TEMPORARY INSTALLMENT. This will be overhauled with a Vertex list soon.
+                            Vertex[] faceVertices = new Vertex[x.length];
+                            for(int j=0;j<x.length;j++){
+                                faceVertices[j] = new Vertex(x[j],y[j],z[j]);
+                            }
                             
-                            f = new Face(x,y,z,normals.get(normalID));
+                            f = new Face(faceVertices,normals.get(normalID));
                             r.addFace(f);
+
                             x = new double[0];
                             y = new double[0];
                             z = new double[0];
