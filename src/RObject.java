@@ -29,8 +29,9 @@ public class RObject{
         * Performs all 3D logic. Such as translation and rotation in the 3D environment.
     */
     public void actions(Camera cam){
-        // System.out.println("\n\n\n");
         for(int i=0;i<faces.size();i++){
+            if(Math.random() < .1)
+                System.out.println(faces.get(i).getNormalL());
             faces.get(i).reset();
             faces.get(i).rotateZ(cam);
             faces.get(i).rotateX(cam);

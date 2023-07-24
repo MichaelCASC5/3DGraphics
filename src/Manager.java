@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,18 +12,8 @@ public class Manager{
         * Append vertices to new face generated
     */
     public static Vertex[] append(Vertex[] a, Vertex n){
-        Vertex[] output = new Vertex[a.length+1];
-        
-        for(int i=0;i<output.length;i++){
-            output[i] = new Vertex();
-            
-            if(i < output.length - 1){
-                output[i].setAll(a[i]);
-            }else{
-                output[output.length-1].setAll(n);
-            }
-        }
-        
+        Vertex[] output = Arrays.copyOf(a,a.length+1);
+        output[output.length-1] = new Vertex(n.getX(),n.getY(),n.getZ());
         return output;
     }
     /*
@@ -99,11 +90,11 @@ public class Manager{
                             line = line.substring(num+1);
                             
                             num = line.indexOf(" ");
-                            n.setY(Double.parseDouble(line.substring(0,num)));
+                            n.setZ(Double.parseDouble(line.substring(0,num)));
                             line = line.substring(num+1);
                             
                             num = line.length();
-                            n.setZ(Double.parseDouble(line.substring(0,num)));
+                            n.setY(Double.parseDouble(line.substring(0,num)));
                             
                             normals.add(n);
                         }

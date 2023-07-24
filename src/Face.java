@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import java.awt.image.BufferedImage;
 
@@ -145,6 +146,9 @@ public class Face{
         }
         normL.setAll(normG);
         draw = true;
+
+        //Mounting normal to hitchhike
+        local = Manager.append(local,normG);
     }
     /*
         * Rotates the 3D world about the Z (vertical) axis.
@@ -158,6 +162,10 @@ public class Face{
         double a,b;
         
         for(int i=0;i<local.length;i++){
+            if(i==local.length-1){//No translation for normal hitchhiker
+                camX=0;
+                camY=0;
+            }
             xDist = local[i].getX() - camX;
             yDist = local[i].getY() - camY;
             
@@ -187,6 +195,10 @@ public class Face{
         count = 0;
         
         for(int i=0;i<local.length;i++){
+            if(i==local.length-1){//No translation for normal hitchhiker
+                camY=0;
+                camZ=0;
+            }
             yDist = local[i].getY() - camY;
             zDist = local[i].getZ() - camZ; //Edited from global to local
             
@@ -223,6 +235,10 @@ public class Face{
         double camWidth = cam.getWidth();
         double camHeight = cam.getHeight();
 
+        //Dismounting normal from hitchhike
+        normL = local[local.length-1];
+        local = Arrays.copyOf(local, local.length - 1);
+
         /*
             * Computing normal's relationship with the camera.
             * If normal faces away from the camera, don't draw the face.
@@ -231,7 +247,7 @@ public class Face{
 
         int count = 0;
         for(int i=0;i<local.length;i++){
-            //Handling Translations
+            //Calculating distances
             Vertex dist = new Vertex(
                 local[i].getX() - camX,
                 local[i].getY() - camY,
@@ -303,7 +319,6 @@ public class Face{
         *
     */
     public void draw(Graphics g, BufferedImage canvas, Camera cam){
-        // System.out.println(normG);
         if(!draw){
             return;
         }
