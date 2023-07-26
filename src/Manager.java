@@ -13,7 +13,7 @@ public class Manager{
     */
     public static Vertex[] append(Vertex[] a, Vertex n){
         Vertex[] output = Arrays.copyOf(a,a.length+1);
-        output[output.length-1] = new Vertex(n.getX(),n.getY(),n.getZ());
+        output[output.length-1] = new Vertex(n);
         return output;
     }
     /*
@@ -127,7 +127,6 @@ public class Manager{
                                     point in the program.
                                 */
                                 int index = face.indexOf("/");
-                                int gap = face.indexOf(" ");
                                 normalID = Integer.parseInt(face.substring(index+2)) - 1;
                                 
                                 if(index == -1){
@@ -154,7 +153,7 @@ public class Manager{
                             if(normals.size() <= 0){
                                 normals.add(new Vertex());
                             }
-
+                            
                             f = new Face(collector,normals.get(normalID));
                             r.addFace(f);
 

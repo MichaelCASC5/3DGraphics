@@ -82,6 +82,9 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         * Paint to Canvas
     */
     public void paintComponent(Graphics g){
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
         //Clears canvas from previous frame
         canvas = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
@@ -89,24 +92,23 @@ public class Driver extends JComponent implements KeyListener, MouseListener, Mo
         g.setColor(Color.black);
         g.fillRect(0,0,WIDTH,HEIGHT);
         
-        //Drawing objects in scene
+        //Painting objects in scene onto canvas
         for(int i=0;i<scene.size();i++){
-            scene.get(i).actions(cam);
-            scene.get(i).draw(g,canvas,cam);
+            scene.get(i).paint(g2,canvas,cam);
         }
 
-        // Color c = Color.red;
-        // int color = c.getRGB();
-        // for(int i=0;i<WIDTH/2;i++){
-        //     for(int j=0;j<HEIGHT/2;j++){
-        //         canvas.setRGB(i, j, color);
-        //     }
-        // }
+        Color c = Color.red;
+        int color = c.getRGB();
+        for(int i=0;i<WIDTH/2;i++){
+            for(int j=0;j<HEIGHT/2;j++){
+                canvas.setRGB(i, j, color);
+            }
+        }
 
         //Drawing canvas
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.drawImage(canvas, null, null);
+        // super.paintComponent(g);
+        // Graphics2D g2 = (Graphics2D) g;
+        // g2.drawImage(canvas, null, null);
     }
     /*
         * Game Logic

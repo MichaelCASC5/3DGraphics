@@ -49,6 +49,10 @@ public class Camera{
     public double getYaw(){
         return yaw;
     }
+    public double[] getCamArray(){
+        double[] output = {x,y,z,WIDTH,HEIGHT,yaw,pitch};
+        return output;
+    }
     /*
         * Setting Yaw and Pitch based on the built-in limits of the camera in 3D space.
 
