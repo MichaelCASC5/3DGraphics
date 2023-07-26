@@ -30,11 +30,10 @@ public class RObject{
     */
     public void actions(Camera cam){
         for(int i=0;i<faces.size();i++){
-            if(Math.random() < .1)
-                System.out.println(faces.get(i).getNormalL());
             faces.get(i).reset();
             faces.get(i).rotateZ(cam);
             faces.get(i).rotateX(cam);
+            faces.get(i).normals(cam);
             faces.get(i).toscreen(cam);
         }
         /*

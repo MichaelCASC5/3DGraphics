@@ -74,11 +74,11 @@ public class Manager{
                             line = line.substring(num+1);
                             
                             num = line.indexOf(" ");
-                            v.setY(Double.parseDouble(line.substring(0,num)));
+                            v.setZ(Double.parseDouble(line.substring(0,num)));
                             line = line.substring(num+1);
                             
                             num = line.length();
-                            v.setZ(Double.parseDouble(line.substring(0,num)));
+                            v.setY(Double.parseDouble(line.substring(0,num)) * -1);
                             
                             vertices.add(v);
                         }
@@ -94,7 +94,7 @@ public class Manager{
                             line = line.substring(num+1);
                             
                             num = line.length();
-                            n.setY(Double.parseDouble(line.substring(0,num)));
+                            n.setY(Double.parseDouble(line.substring(0,num)) * -1);
                             
                             normals.add(n);
                         }
@@ -126,9 +126,10 @@ public class Manager{
                                     the entire "face" data as it exists at this
                                     point in the program.
                                 */
-                                int index;
-                                index = face.indexOf("/");
-                                normalID = Integer.parseInt(face.substring(index+2,index+3)) - 1;
+                                int index = face.indexOf("/");
+                                int gap = face.indexOf(" ");
+                                normalID = Integer.parseInt(face.substring(index+2)) - 1;
+                                
                                 if(index == -1){
                                     index = face.length();
                                 }
@@ -139,8 +140,8 @@ public class Manager{
                                 
                                 Vertex collector_input = new Vertex(
                                     vertices.get(index).getX(),
-                                    vertices.get(index).getZ()*-1,
-                                    vertices.get(index).getY()
+                                    vertices.get(index).getY(),
+                                    vertices.get(index).getZ()
                                 );
                                 
                                 collector = append(collector, collector_input);
@@ -153,7 +154,7 @@ public class Manager{
                             if(normals.size() <= 0){
                                 normals.add(new Vertex());
                             }
-                            
+
                             f = new Face(collector,normals.get(normalID));
                             r.addFace(f);
 
@@ -176,7 +177,7 @@ public class Manager{
             //That RObject gets added to the scene.
             scene.add(r);
         }
-        
+
         return scene;
     }
 }

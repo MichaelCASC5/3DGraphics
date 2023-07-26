@@ -162,10 +162,8 @@ public class Face{
         double a,b;
         
         for(int i=0;i<local.length;i++){
-            if(i==local.length-1){//No translation for normal hitchhiker
-                camX=0;
-                camY=0;
-            }
+            if(i==local.length-1){camX=0;camY=0;}//No translation for normal hitchhiker
+            
             xDist = local[i].getX() - camX;
             yDist = local[i].getY() - camY;
             
@@ -195,10 +193,8 @@ public class Face{
         count = 0;
         
         for(int i=0;i<local.length;i++){
-            if(i==local.length-1){//No translation for normal hitchhiker
-                camY=0;
-                camZ=0;
-            }
+            if(i==local.length-1){camY=0;camZ=0;}//No translation for normal hitchhiker
+            
             yDist = local[i].getY() - camY;
             zDist = local[i].getZ() - camZ; //Edited from global to local
             
@@ -217,7 +213,32 @@ public class Face{
             }
         }
         //If all vertices of the face are behind the y position of the camera, do not draw the face.
-        if(count >= local.length){
+        if(count >= local.length-1){//-1 to not account for normal
+            draw = false;
+        }
+    }
+    /*
+        * Computes whether the face is facing the camera or not.
+    */
+    public void normals(Camera cam){
+        double camX = cam.getX();
+        double camY = cam.getY();
+        double camZ = cam.getZ();
+
+        //Dismounting normal from hitchhike
+        normL = local[local.length-1];
+        local = Arrays.copyOf(local, local.length - 1);
+
+        //Adding the normal to the first vertex
+        Vertex sum = new Vertex(local[0]);
+        sum.add(normL);
+
+        //Computing distances
+        double behind = Math.sqrt(Math.pow(local[0].getX()-camX,2) + Math.pow(local[0].getY()-camY,2) + Math.pow(local[0].getZ()-camZ,2));
+        double ahead = Math.sqrt(Math.pow(sum.getX()-camX,2) + Math.pow(sum.getY()-camY,2) + Math.pow(sum.getZ()-camZ,2));
+
+        //If the point ahead (sum) of the chosen vertex is further than that vertex, the face faces away. Do not draw.
+        if(ahead > behind){
             draw = false;
         }
     }
@@ -229,15 +250,14 @@ public class Face{
         can be ignored, as they are not neccessary for drawing onto the 2D display.
     */
     public void toscreen(Camera cam){
+        if(!draw){
+            return;
+        }
         double camX = cam.getX();
         double camY = cam.getY();
         double camZ = cam.getZ();
         double camWidth = cam.getWidth();
         double camHeight = cam.getHeight();
-
-        //Dismounting normal from hitchhike
-        normL = local[local.length-1];
-        local = Arrays.copyOf(local, local.length - 1);
 
         /*
             * Computing normal's relationship with the camera.
@@ -363,7 +383,7 @@ public class Face{
             if((prevX < 0 || curX < 0 || prevX > camWidth || curX > camWidth)
                 || (prevY < 0 || curY < 0 || prevY > camHeight || curY > camHeight)
                 ){
-                return;
+                // return;
             }
             
             // if(draw){

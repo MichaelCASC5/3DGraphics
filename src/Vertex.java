@@ -15,6 +15,9 @@ public class Vertex{
         y = b;
         z = c;
     }
+    public Vertex(Vertex v){
+        setAll(v);
+    }
     public void setX(double n){
         x = n;
     }
@@ -35,6 +38,16 @@ public class Vertex{
     }
     public String toString(){
         return "" + x + ", " + y + ", " + z;
+    }
+    public void add(Vertex v){
+        x+=v.getX();
+        y+=v.getY();
+        z+=v.getZ();
+    }
+    public void multiply(Vertex v){
+        x*=v.getX();
+        y*=v.getY();
+        z*=v.getZ();
     }
     public void setAll(Vertex v){
         x = v.getX();
